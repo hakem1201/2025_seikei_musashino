@@ -6,23 +6,20 @@
 <title>XX Pay Demo 完全版</title>
 
 <style>
-:root {
-  --bg: #f5f5f5;
-  --card: #fff;
-  --text: #222;
-  --accent: #6b8cff;
-  --accent-dark: #5a78e6;
-  --negative: #d64545;
-  --positive: #2e9b4f;
+:root{
+  --bg:#f5f5f5;
+  --card:#fff;
+  --text:#222;
+  --accent:#6b8cff;
+  --accent-dark:#5a78e6;
+  --negative:#d64545;
 }
-
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
-
 .app{
   max-width:420px;
   margin:0 auto;
@@ -30,42 +27,35 @@ body{
   display:flex;
   flex-direction:column;
 }
-
 header{
   padding:16px;
   text-align:center;
   font-size:22px;
   font-weight:bold;
 }
-
 main{
   flex:1;
   padding:16px;
   padding-bottom:80px;
 }
-
 .card{
   background:var(--card);
   border-radius:14px;
   padding:16px;
   margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.06);
+  box-shadow:0 4px 12px rgba(0,0,0,.06);
 }
 
-/* ===== バーコード（画像差し替え）===== */
+/* ===== バーコード（画像版） ===== */
 .barcode{
-  height:80px;
-  margin-bottom:16px;
-  border-radius:8px;
-
+  height:110px;
+  padding:12px 16px;
   background-color:#fff;
   background-image:url("barcode.png");
   background-repeat:no-repeat;
   background-position:center;
   background-size:contain;
-
-  /* フォールバック */
-  box-shadow: inset 0 0 0 1px #ddd;
+  border-radius:8px;
 }
 
 .balance{
@@ -74,12 +64,10 @@ main{
   font-size:18px;
   font-weight:bold;
 }
-
 .quick{
   display:flex;
   gap:8px;
 }
-
 .quick button{
   flex:1;
   padding:12px 0;
@@ -89,7 +77,6 @@ main{
   font-size:14px;
   cursor:pointer;
 }
-
 .pay-main{
   width:100%;
   padding:14px 0;
@@ -99,15 +86,13 @@ main{
   border-radius:999px;
   background:linear-gradient(180deg,var(--accent),var(--accent-dark));
   color:#fff;
-  box-shadow:0 6px 14px rgba(10,108,255,0.3);
+  box-shadow:0 6px 14px rgba(10,108,255,.3);
   cursor:pointer;
 }
-
-.pay-main:active{transform:scale(0.98);}
+.pay-main:active{transform:scale(.98);}
 
 .history{font-size:14px;color:#666;}
 .history-title{font-size:16px;font-weight:bold;margin-bottom:12px;}
-
 .history-item{
   display:flex;
   justify-content:space-between;
@@ -115,20 +100,14 @@ main{
   padding:12px 0;
   border-top:1px solid #eee;
 }
-
-.history-item:first-of-type{border-top:none;}
-
 .history-left{display:flex;flex-direction:column;}
 .history-store{font-size:15px;font-weight:bold;}
 .history-date{font-size:12px;color:#888;margin-top:2px;}
-
 .history-amount.minus{color:var(--negative);}
 
 nav{
   position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
+  bottom:0;left:0;right:0;
   max-width:420px;
   margin:0 auto;
   display:flex;
@@ -136,7 +115,6 @@ nav{
   background:#fff;
   z-index:1000;
 }
-
 nav button{
   flex:1;
   padding:8px 0 6px;
@@ -149,88 +127,6 @@ nav button{
   gap:4px;
   cursor:pointer;
 }
-
-.nav-icon{font-size:20px;line-height:1;}
-.nav-label{font-size:12px;}
-
-.pay-screen{
-  display:none;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  min-height:60vh;
-}
-
-.pay-screen video{
-  width:100%;
-  height:240px;
-  background:#000;
-  border-radius:12px;
-}
-
-.fake-scan{
-  margin-top:12px;
-  padding:12px 24px;
-  font-size:16px;
-  cursor:pointer;
-}
-
-/* ==== 金額入力画面 ==== */
-.clerk-view{
-  background:#000;
-  color:#fff;
-  padding:12px;
-  text-align:center;
-  transform:rotate(180deg);
-}
-
-.clerk-store{font-size:14px;font-weight:bold;}
-.clerk-amount{font-size:32px;font-weight:bold;}
-
-.user-view{padding:16px;}
-.user-view .store{font-size:16px;font-weight:bold;}
-.user-view .amount{font-size:40px;font-weight:bold;}
-
-.keypad{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px;
-  margin-top:12px;
-}
-
-.keypad button{
-  padding:16px;
-  font-size:18px;
-  border-radius:8px;
-  border:1px solid #ccc;
-  background:#fff;
-  cursor:pointer;
-}
-
-.spinner{
-  width:40px;
-  height:40px;
-  border:4px solid #ccc;
-  border-top-color:#000;
-  border-radius:50%;
-  animation:spin 1s linear infinite;
-  margin:24px auto;
-}
-
-@keyframes spin{to{transform:rotate(360deg);}}
-
-.checkmark{
-  width:80px;
-  height:80px;
-  border-radius:50%;
-  border:4px solid var(--accent);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:48px;
-  color:var(--accent);
-  margin:0 auto 12px;
-}
 </style>
 </head>
 
@@ -239,7 +135,6 @@ nav button{
 <header>武蔵野市 くらし地域応援券<br>電子システム デモ</header>
 
 <main>
-<!-- ホーム -->
 <section id="home" style="display:block">
   <div class="card" style="text-align:center">
     <div class="barcode"></div>
@@ -252,77 +147,16 @@ nav button{
   </div>
 
   <div class="card quick">
-    <button onclick="alert('チャージ（未実装）')">チャージ</button>
-    <button onclick="alert('送金（未実装）')">送金</button>
-    <button onclick="showHistory()">履歴</button>
+    <button>チャージ</button>
+    <button>送金</button>
+    <button>履歴</button>
   </div>
 
   <div class="card history" id="history">
     <div class="history-title">利用履歴</div>
   </div>
 </section>
-
-<!-- QR決済 -->
-<section id="pay" class="pay-screen">
-  <div class="card" style="width:100%;text-align:center">
-    <video playsinline autoplay></video>
-    <p style="margin-top:12px">QRコードを読み取ってください（デモ）</p>
-    <button class="fake-scan" onclick="manualScan()">読み込み</button>
-  </div>
-</section>
-
-<!-- 金額入力 -->
-<section id="amount" style="display:none">
-  <div class="card" style="padding:0;overflow:hidden">
-    <div class="clerk-view">
-      <div class="clerk-store">イレブンマート 武蔵野店</div>
-      <div class="clerk-amount" id="amountBack">¥0</div>
-    </div>
-    <div class="user-view">
-      <div class="store">🏪 イレブンマート 武蔵野店</div>
-      <div class="amount" id="amountFront">¥0</div>
-    </div>
-  </div>
-
-  <div class="keypad">
-    <button onclick="inputNum('7')">7</button>
-    <button onclick="inputNum('8')">8</button>
-    <button onclick="inputNum('9')">9</button>
-    <button onclick="inputNum('4')">4</button>
-    <button onclick="inputNum('5')">5</button>
-    <button onclick="inputNum('6')">6</button>
-    <button onclick="inputNum('1')">1</button>
-    <button onclick="inputNum('2')">2</button>
-    <button onclick="inputNum('3')">3</button>
-    <button onclick="clearAmount()">C</button>
-    <button onclick="inputNum('0')">0</button>
-    <button onclick="confirmAmount()">確認</button>
-  </div>
-</section>
-
-<section id="processing" style="display:none;text-align:center">
-  <div class="spinner"></div>
-  <p>処理中…</p>
-</section>
-
-<section id="complete" style="display:none;text-align:center">
-  <div class="checkmark">✓</div>
-  <h2>決済完了</h2>
-  <p>ありがとうございました（デモ）</p>
-  <button onclick="showHome()">ホームへ</button>
-</section>
 </main>
-
-<nav>
-  <button onclick="showHome()"><div class="nav-icon">🏠</div><div class="nav-label">ホーム</div></button>
-  <button onclick="showPay()"><div class="nav-icon">💳</div><div class="nav-label">決済</div></button>
-  <button onclick="alert('設定画面（未実装）')"><div class="nav-icon">⚙️</div><div class="nav-label">設定</div></button>
-</nav>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
-<script>
-/* JSは前回最終版から一切変更なし */
-</script>
 </body>
 </html>

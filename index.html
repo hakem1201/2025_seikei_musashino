@@ -3,186 +3,506 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>XX Pay Demo 完全版</title>
-
+<title>武蔵野市 くらし地域応援券 電子試作バージョン</title>
 <style>
-:root{
-  --bg:#f5f5f5;
-  --card:#fff;
-  --text:#222;
-  --accent:#6b8cff;
-  --accent-dark:#5a78e6;
-  --negative:#d64545;
-  --sub:#777;
+:root {
+  --bg: #f5f5f5;
+  --card: #fff;
+  --text: #222;
+  --accent: #6b8cff;
+  --accent-dark: #5a78e6;
+  --negative: #d64545;
+  --positive: #2e9b4f;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-}
-.app{
-  max-width:420px;
-  margin:0 auto;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-}
-header{
-  padding:16px;
-  text-align:center;
-  font-size:22px;
-  font-weight:bold;
-}
-main{
-  flex:1;
-  padding:16px;
-  padding-bottom:80px;
-}
-.card{
-  background:var(--card);
-  border-radius:14px;
-  padding:16px;
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;background:var(--bg);color:var(--text);}
+.app{max-width:420px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;}
+header{padding:16px;text-align:center;font-size:22px;font-weight:bold;}
+main{flex:1;padding:16px;padding-bottom:80px;}
+.card{background:var(--card);border-radius:14px;padding:16px;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,0,0,0.06);}
+.barcode{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:120px;        /* 高くなりすぎ防止（好みで調整OK） */
+  object-fit:contain;
+  background:#fff;
+  border-radius:8px;
   margin-bottom:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+.balance{display:flex;justify-content:space-between;font-size:18px;font-weight:bold;}
+.quick{display:flex;gap:8px;}
+.quick button{flex:1;padding:12px 0;border-radius:10px;border:1px solid #ddd;background:#fafafa;font-size:14px;cursor:pointer;}
+.pay-main{width:100%;padding:14px 0;font-size:18px;font-weight:bold;border:none;border-radius:999px;background:linear-gradient(180deg,var(--accent),var(--accent-dark));color:#fff;box-shadow:0 6px 14px rgba(10,108,255,0.3);cursor:pointer;}
+.pay-main:active{transform:scale(0.98);}
+nav{position:fixed;bottom:0;left:0;right:0;max-width:420px;margin:0 auto;display:flex;border-top:1px solid #ccc;background:#fff;z-index:1000;}
+nav button{flex:1;padding:8px 0 6px;background:none;border:none;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;}
+nav button.active{font-weight:bold;}
+.pay-screen{display:none;flex-direction:column;justify-content:center;align-items:center;min-height:60vh;}
+.pay-screen video{width:100%;height:240px;background:#000;border-radius:12px;}
+.fake-scan{margin-top:12px;padding:12px 24px;font-size:16px;cursor:pointer;}
+
+/* ==== 金額入力画面 UI ==== */
+.clerk-view{background:#000;color:#fff;padding:12px;text-align:center;transform:rotate(180deg);}
+.clerk-store{font-size:14px;font-weight:bold;}
+.clerk-amount{font-size:32px;font-weight:bold;}
+.user-view{padding:16px;text-align:left;}
+.user-view .store{font-size:16px;font-weight:bold;}
+.user-view .amount{font-size:40px;font-weight:bold;}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px;}
+.keypad button{padding:16px;font-size:18px;border-radius:8px;border:1px solid #ccc;background:#fff;cursor:pointer;}
+
+.history{font-size:14px;color:#666; max-height:200px; overflow-y:auto;}
+.history-title{font-size:16px;font-weight:bold;margin-bottom:12px;}
+.history-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #eee;}
+.history-item:first-of-type{border-top:none;}
+.history-left{display:flex;flex-direction:column;}
+.history-store{font-size:15px;font-weight:bold;}
+.history-date{font-size:12px;color:#888;margin-top:2px;}
+.history-amount.minus{color:var(--negative);}
+
+.spinner{width:40px;height:40px;border:4px solid #ccc;border-top-color:#000;border-radius:50%;animation:spin 1s linear infinite;margin:24px auto;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.checkmark{width:80px;height:80px;border-radius:50%;border:4px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:48px;color:var(--accent);margin:0 auto 12px;animation:pop .6s ease-out forwards;}
+@keyframes pop{0%{transform:scale(0);opacity:0}80%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+#complete button{margin-top:16px;padding:10px 24px;font-size:16px;border:none;border-radius:999px;background:var(--accent);color:#fff;}
+
+/* ==== バーコード拡大表示 ==== */
+.barcode-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
 }
 
-/* ===== バーコード ===== */
-.barcode{
-  background:#f7f7f7;
-  border-radius:12px;
+.barcode-modal-bg{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+}
+
+.barcode-modal-img{
+  position:relative;
+  max-width:90%;
+  max-height:60%;
+  background:#fff;
   padding:16px;
-  margin-bottom:8px;
+  border-radius:12px;
+}
+
+/* ===== QR読み取り画面（モダンUI） ===== */
+.qr-card{
+  width:100%;
+  text-align:center;
+}
+
+.qr-header{
+  margin-bottom:12px;
+}
+
+.qr-title{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.qr-sub{
+  font-size:13px;
+  color:#666;
+  margin-top:4px;
+}
+
+.qr-camera{
+  position:relative;
+  width:100%;
+  height:240px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#000;
+  margin:12px 0 16px;
+}
+
+.qr-camera video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* 読み取りガイド枠 */
+.qr-frame{
+  position:absolute;
+  inset:16px;
+  border:2px solid rgba(255,255,255,.8);
+  border-radius:8px;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.25);
+  pointer-events:none;
+}
+
+.fake-scan{
+  width:100%;
+  padding:12px 0;
+  font-size:16px;
+  border-radius:999px;
+  border:none;
+  background:#eee;
+  cursor:pointer;
+}
+.fake-scan:active{
+  transform:scale(.98);
+}
+
+/* ==== 決済完了画面（モダンUI） ==== */
+.complete-screen{
   display:flex;
   justify-content:center;
   align-items:center;
+  min-height:60vh;
 }
-.barcode img{
+
+.complete-card{
   width:100%;
-  max-width:300px;
-  height:auto;
+  max-width:360px;
+  background:#F9F9FF;
+  border-radius:24px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.06),
+    0 8px 24px rgba(0,0,0,0.08);
+  color:#222;
+  padding:32px 24px;
+  text-align:center;
 }
 
-/* 店舗情報 */
-.terminal-info{
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  color:var(--sub);
-  padding:4px 4px 12px;
+.complete-card h2{
+  font-size:24px;
+  margin:12px 0 8px;
+  color:#222;
 }
 
-.balance{
-  display:flex;
-  justify-content:space-between;
-  font-size:18px;
-  font-weight:bold;
+.complete-text{
+  font-size:14px;
+  color:#555; /* ← 見やすく */
+  margin-bottom:24px;
 }
-.quick{
-  display:flex;
-  gap:8px;
-}
-.quick button{
-  flex:1;
-  padding:12px 0;
-  border-radius:10px;
-  border:1px solid #ddd;
-  background:#fafafa;
-}
-.pay-main{
+
+.complete-btn{
   width:100%;
   padding:14px 0;
-  font-size:18px;
+  font-size:16px;
   font-weight:bold;
   border:none;
   border-radius:999px;
   background:linear-gradient(180deg,var(--accent),var(--accent-dark));
   color:#fff;
-  box-shadow:0 6px 14px rgba(10,108,255,.3);
+  cursor:pointer;
+  box-shadow:0 6px 14px rgba(10,108,255,0.35);
 }
-.pay-main:active{transform:scale(.98);}
 
-/* ===== QR画面 ===== */
-.pay-screen{
-  display:none;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  min-height:60vh;
+.complete-btn:active{
+  transform:scale(0.97);
 }
-.pay-screen video{
+
+/* ==== iOS風 完了アイコン ==== */
+.ios-complete-icon{
+  width:72px;
+  height:72px;
+  margin:0 auto 20px;
+  opacity:0;
+  transform:scale(0.92);
+  animation:ios-pop 0.35s cubic-bezier(.2,.8,.2,1) forwards;
+}
+
+.ios-complete-icon svg{
   width:100%;
-  height:240px;
-  background:#000;
-  border-radius:12px;
+  height:100%;
 }
-.fake-scan{
-  margin-top:12px;
-  padding:12px 24px;
-}
-</style>
-</head>
 
+.ios-complete-icon circle,
+.ios-complete-icon path{
+  fill:none;
+  stroke:#007AFF;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.ios-complete-icon circle{
+  stroke-dasharray:151;
+  stroke-dashoffset:151;
+  animation:ios-circle 0.5s ease-out forwards;
+}
+
+.ios-complete-icon path{
+  stroke-dasharray:48;
+  stroke-dashoffset:48;
+  animation:ios-check 0.25s ease-out forwards;
+  animation-delay:0.45s;
+}
+
+@keyframes ios-circle{
+  to{ stroke-dashoffset:0; }
+}
+
+@keyframes ios-check{
+  to{ stroke-dashoffset:0; }
+}
+
+@keyframes ios-pop{
+  to{
+    opacity:1;
+    transform:scale(1);
+  }
+}
+
+</style>
+
+</head>
 <body>
 <div class="app">
-<header>武蔵野市 くらし地域応援券<br>電子システム デモ</header>
-
+<header>武蔵野市 くらし地域応援券<br>電子システム プロトタイプ</header>
 <main>
-
 <!-- ホーム -->
-<section id="home">
+<section id="home" style="display:block">
   <div class="card" style="text-align:center">
-    <div class="barcode">
-      <img src="barcode.png" alt="バーコード">
-    </div>
-
-    <div class="terminal-info">
-      <span>店舗ID：MUS-0421</span>
-      <span>端末番号：T-03</span>
-    </div>
-
+    <img src="barcode.png" alt="バーコード" class="barcode">
     <button class="pay-main" id="payMainBtn">支払う</button>
   </div>
-
-  <div class="card balance">
-    <span>利用可能額</span>
-    <span id="balance">3,245 円</span>
+  <div class="card balance"><span>利用可能額</span><span id="balance">3,245 円</span></div>
+  <div class="card quick">
+    <button onclick="alert('チャージ（未実装）')">チャージ</button>
+    <button onclick="alert('送金（未実装）')">送金</button>
+    <button onclick="showHistory()">履歴</button>
+  </div>
+  <div class="card history" id="history">
+    <div class="history-title">利用履歴</div>
   </div>
 </section>
 
 <!-- QR決済 -->
 <section id="pay" class="pay-screen">
-  <div class="card" style="width:100%;text-align:center">
-    <video playsinline autoplay></video>
-    <p style="margin-top:12px">QRコードを読み取ってください（デモ）</p>
-    <button class="fake-scan" onclick="alert('次工程へ')">読み込み</button>
+  <div class="card qr-card">
+    <div class="qr-header">
+      <div class="qr-title">QRコード読み取り</div>
+      <div class="qr-sub">店舗のQRコードを枠内に合わせてください</div>
+    </div>
+
+    <div class="qr-camera">
+      <video playsinline autoplay muted></video>
+      <div class="qr-frame"></div>
+    </div>
+
+    <button class="fake-scan" onclick="manualScan()">読み込み</button>
   </div>
 </section>
 
-</main>
+<!-- 金額入力 -->
+<section id="amount" style="display:none">
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="clerk-view">
+      <div class="clerk-store">イレブンマート 武蔵野店</div>
+      <div class="clerk-amount" id="amountBack">¥0</div>
+    </div>
+    <div class="user-view">
+      <div class="store">🏪 イレブンマート 武蔵野店</div>
+      <div class="amount" id="amountFront">¥0</div>
+    </div>
+  </div>
+  <div class="keypad">
+    <button onclick="inputNum('7')">7</button><button onclick="inputNum('8')">8</button><button onclick="inputNum('9')">9</button>
+    <button onclick="inputNum('4')">4</button><button onclick="inputNum('5')">5</button><button onclick="inputNum('6')">6</button>
+    <button onclick="inputNum('1')">1</button><button onclick="inputNum('2')">2</button><button onclick="inputNum('3')">3</button>
+    <button onclick="clearAmount()">C</button><button onclick="inputNum('0')">0</button><button onclick="confirmAmount()">確認</button>
+  </div>
+</section>
+
+<!-- 処理中 -->
+<section id="processing" style="display:none;text-align:center">
+  <div class="spinner"></div>
+  <p>処理中…</p>
+</section>
+
+<!-- 完了 -->
+<section id="complete" class="complete-screen" style="display:none">
+  <div class="complete-card">
+    <div class="ios-complete-icon">
+      <svg viewBox="0 0 52 52">
+        <circle cx="26" cy="26" r="24" />
+        <path d="M15 27 L23 35 L37 19" />
+      </svg>
+    </div>
+    
+    <h2>決済完了</h2>
+    <p class="complete-text">お支払いが正常に完了しました</p>
+    <button class="complete-btn" onclick="showHome()">ホームへ戻る</button>
+  </div>
+</section>
+
+<!-- バーコード拡大表示 -->
+<div id="barcodeModal" class="barcode-modal">
+  <div class="barcode-modal-bg"></div>
+  <img src="barcode.png" class="barcode-modal-img">
 </div>
 
+</main>
+
+<nav id="bottomNav">
+  <button onclick="showHome()"><div class="nav-icon">🏠</div><div class="nav-label">ホーム</div></button>
+  <button onclick="showPay()"><div class="nav-icon">💳</div><div class="nav-label">決済</div></button>
+  <button onclick="alert('設定画面（未実装）')"><div class="nav-icon">⚙️</div><div class="nav-label">設定</div></button>
+</nav>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const home = document.getElementById('home');
-  const pay  = document.getElementById('pay');
-  const payBtn = document.getElementById('payMainBtn');
+window.addEventListener('DOMContentLoaded', () => {
+  const sections = {
+    home: document.getElementById('home'),
+    pay: document.getElementById('pay'),
+    amount: document.getElementById('amount'),
+    processing: document.getElementById('processing'),
+    complete: document.getElementById('complete')
+  };
+  const payMainBtn = document.getElementById('payMainBtn');
+  const amountFront = document.getElementById('amountFront');
+  const amountBack  = document.getElementById('amountBack');
+  const balanceEl = document.getElementById('balance');
+  const historyEl = document.getElementById('history');
+  const soundRead = document.getElementById('soundRead');
+  const soundPay  = document.getElementById('soundPay');
 
-  function showHome(){
-    home.style.display = 'block';
-    pay.style.display  = 'none';
+  let currentAmount = '';
+  let balance = 3245;
+  let videoStream;
+
+  function showSection(name){
+    Object.values(sections).forEach(s=>s.style.display='none');
+    sections[name].style.display=(name==='pay')?'flex':(name==='amount')?'block':'block';
+    if(name!=='pay') stopCamera();
+    if(name==='pay') startCamera();
+  
+  const barcodeImg = document.querySelector('.barcode');
+  const barcodeModal = document.getElementById('barcodeModal');
+  const barcodeModalBg = document.querySelector('.barcode-modal-bg');
+
+  barcodeImg.addEventListener('click', () => {
+    barcodeModal.style.display = 'flex';
+  });
+
+  barcodeModalBg.addEventListener('click', () => {
+    barcodeModal.style.display = 'none';
+  });
+
+
   }
 
-  function showPay(){
-    home.style.display = 'none';
-    pay.style.display  = 'flex';
+  function showHome(){ showSection('home'); }
+  function showPay(){ showSection('pay'); }
+
+  // QRコード処理
+  const videoEl = document.querySelector('#pay video');
+
+  function startCamera(){
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    alert('この端末ではカメラを使用できません');
+    return;
   }
 
-  // ★ 前回完成版の挙動を完全復活
-  payBtn.addEventListener('click', showPay);
+  navigator.mediaDevices.getUserMedia({
+    video: { facingMode: "environment" },
+    audio: false
+  })
+  .then(stream => {
+    videoStream = stream;
+    videoEl.srcObject = stream;
+
+    // iOS Safari対策：play失敗を明示的に拾う
+    const playPromise = videoEl.play();
+    if(playPromise !== undefined){
+      playPromise.catch(err => {
+        console.error(err);
+        alert('カメラの再生がブラウザによりブロックされました');
+      });
+    }
+
+    scanLoop();
+  })
+  .catch(err => {
+    console.error(err);
+    alert('カメラを起動できませんでした');
+  });
+}
+  function stopCamera(){ if(videoStream){ videoStream.getTracks().forEach(t=>t.stop()); videoStream=null; } }
+
+  function scanLoop(){
+    if(!videoStream) return;
+    const canvas=document.createElement('canvas');
+    canvas.width=videoEl.videoWidth; canvas.height=videoEl.videoHeight;
+    const ctx=canvas.getContext('2d'); ctx.drawImage(videoEl,0,0,canvas.width,canvas.height);
+    const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+    const code=jsQR(imageData.data,canvas.width,canvas.height);
+    if(code){ stopCamera(); onQrDetected(); return; }
+    requestAnimationFrame(scanLoop);
+  }
+
+  function onQrDetected(){
+    soundRead.currentTime = 0;
+    soundRead.play().catch(()=>{});
+    currentAmount='';
+    updateAmount();
+    showSection('amount');
+  }
+  function manualScan(){ stopCamera(); onQrDetected(); }
+
+  // 金額入力
+  function inputNum(n){ currentAmount+=n; updateAmount(); }
+  function clearAmount(){ currentAmount=''; updateAmount(); }
+  function updateAmount(){ 
+    const val=currentAmount?`¥${Number(currentAmount).toLocaleString()}`:'¥0';
+    amountFront.textContent=val;
+    amountBack.textContent=val;
+  }
+
+  function confirmAmount(){
+    if(!currentAmount) return;
+    const payValue = Number(currentAmount);
+    if(payValue>balance){ alert('残高不足です'); return; }
+    if(!confirm(`¥${payValue.toLocaleString()} を支払いますか？`)) return;
+    showSection('processing');
+    setTimeout(()=>{
+      balance -= payValue;
+      balanceEl.textContent=`${balance.toLocaleString()} 円`;
+      addHistory(payValue);
+      soundPay.currentTime = 0;
+      soundPay.play().catch(()=>{});
+      showSection('complete');
+      setTimeout(showHome,3000);
+    },2000);
+  }
+
+  function addHistory(amount){
+    const item = document.createElement('div'); item.className='history-item';
+    const left = document.createElement('div'); left.className='history-left';
+    const store = document.createElement('div'); store.className='history-store'; store.textContent='イレブンマート 武蔵野店';
+    const date = document.createElement('div'); date.className='history-date'; const now=new Date(); date.textContent=`${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`;
+    left.append(store, date);
+    const amt = document.createElement('div'); amt.className='history-amount minus'; amt.textContent=`-${amount.toLocaleString()}円`;
+    item.append(left, amt);
+    const title = historyEl.querySelector('.history-title');
+    historyEl.insertBefore(item, title.nextSibling);
+  }
+
+  function showHistory(){ showHome(); alert('履歴は下部に追加されます'); }
+
+  payMainBtn.addEventListener('click', showPay);
+  window.showHome=showHome; window.showPay=showPay;
+  window.inputNum=inputNum; window.clearAmount=clearAmount; window.confirmAmount=confirmAmount; window.manualScan=manualScan;
 
   showHome();
 });
 </script>
+
+<!-- 効果音 -->
+<audio id="soundRead" src="read.mp3" preload="auto"></audio>
+<audio id="soundPay"  src="pay.mp3"  preload="auto"></audio>
+
 </body>
 </html>

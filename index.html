@@ -346,7 +346,7 @@ nav button:hover {
   </div>
   <div class="card balance"><span>利用可能額</span><span id="balance">3,245 円</span></div>
   <div class="card quick">
-    <button onclick="alert('チャージ（未実装）')">チャージ</button>
+    <button onclick="showCharge()">チャージ</button>
     <button onclick="alert('送金（未実装）')">送金</button>
     <button onclick="showHistory()">履歴</button>
   </div>
@@ -414,6 +414,35 @@ nav button:hover {
   </div>
 </section>
 
+<!-- チャージ画面 -->
+<section id="charge" class="pay-screen" style="display:none">
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div class="clerk-view">
+      <div class="clerk-store">開発者モード：チャージ画面</div>
+      <div class="clerk-amount" id="chargeBack">¥0</div>
+    </div>
+    <div class="user-view">
+      <div class="store">チャージ金額入力</div>
+      <div class="amount" id="chargeFront">¥0</div>
+    </div>
+  </div>
+
+  <div class="keypad">
+    <button onclick="inputCharge('7')">7</button>
+    <button onclick="inputCharge('8')">8</button>
+    <button onclick="inputCharge('9')">9</button>
+    <button onclick="inputCharge('4')">4</button>
+    <button onclick="inputCharge('5')">5</button>
+    <button onclick="inputCharge('6')">6</button>
+    <button onclick="inputCharge('1')">1</button>
+    <button onclick="inputCharge('2')">2</button>
+    <button onclick="inputCharge('3')">3</button>
+    <button onclick="clearCharge()">C</button>
+    <button onclick="inputCharge('0')">0</button>
+    <button onclick="confirmCharge()">確認</button>
+  </div>
+</section>
+
 <!-- バーコード拡大表示 -->
 <div id="barcodeModal" class="barcode-modal">
   <div class="barcode-modal-bg"></div>
@@ -470,6 +499,48 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
   }
+
+// ===== チャージ画面操作 =====
+let currentCharge = '';
+
+sections.charge = document.getElementById('charge'); // sectionsに追加
+
+function showCharge(){
+  showSection('charge'); 
+  currentCharge = '';
+  updateCharge();
+}
+
+function inputCharge(n){ 
+  currentCharge += n; 
+  updateCharge(); 
+}
+
+function clearCharge(){ 
+  currentCharge=''; 
+  updateCharge(); 
+}
+
+function updateCharge(){ 
+  const val = currentCharge ? `¥${Number(currentCharge).toLocaleString()}` : '¥0';
+  document.getElementById('chargeFront').textContent = val;
+  document.getElementById('chargeBack').textContent = val;
+}
+
+function confirmCharge(){
+  if(!currentCharge) return;
+  const chargeValue = Number(currentCharge);
+  balance += chargeValue;
+  balanceEl.textContent = `${balance.toLocaleString()} 円`;
+  alert(`¥${chargeValue.toLocaleString()} をチャージしました`);
+  showHome();
+}
+
+// グローバル公開
+window.showCharge = showCharge;
+window.inputCharge = inputCharge;
+window.clearCharge = clearCharge;
+window.confirmCharge = confirmCharge;
 
   function showHome(){ showSection('home'); }
   function showPay(){ showSection('pay'); }

@@ -13,6 +13,7 @@
   --accent:#6b8cff;
   --accent-dark:#5a78e6;
   --negative:#d64545;
+  --sub:#777;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{
@@ -46,22 +47,34 @@ main{
   box-shadow:0 4px 12px rgba(0,0,0,.06);
 }
 
-/* ===== バーコード（画像・比率厳守） ===== */
+/* ===== バーコード ===== */
 .barcode{
   background:#f7f7f7;
   border-radius:12px;
-  padding:16px;              /* 上下左右の余白 */
-  margin-bottom:20px;        /* 支払うボタンとの距離を確保 */
+  padding:16px;
+  margin-bottom:12px;
   display:flex;
   justify-content:center;
   align-items:center;
 }
-
 .barcode img{
   width:100%;
-  max-width:300px;           /* 見た目最適値 */
-  height:auto;               /* 556×218 比率維持 */
+  max-width:300px;
+  height:auto;
   display:block;
+}
+
+/* ===== 店舗情報表示 ===== */
+.terminal-info{
+  font-size:12px;
+  color:var(--sub);
+  display:flex;
+  justify-content:space-between;
+  padding:6px 4px 0;
+  margin-bottom:18px; /* 支払うボタンとの距離 */
+}
+.terminal-info span{
+  white-space:nowrap;
 }
 
 .balance{
@@ -146,6 +159,12 @@ nav button{
     <div class="barcode">
       <img src="barcode.png" alt="バーコード">
     </div>
+
+    <div class="terminal-info">
+      <span>店舗ID：MUS-0421</span>
+      <span>端末番号：T-03</span>
+    </div>
+
     <button class="pay-main" id="payMainBtn">支払う</button>
   </div>
 

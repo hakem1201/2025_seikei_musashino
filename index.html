@@ -297,6 +297,40 @@ nav button.active{font-weight:bold;}
   .pay-screen, .complete-screen { min-height: 70vh; }
 }
 
+/* ===== モダンナビバー ===== */
+nav {
+  border-top: none;                   /* 線をなくしてフラットに */
+  background: #fff;
+  box-shadow: 0 -4px 12px rgba(0,0,0,0.08); /* 上からの軽い影 */
+  border-radius: 16px 16px 0 0;       /* 上だけ丸く */
+  padding: 6px 0;
+}
+
+nav button {
+  font-size: 13px;
+  color: #444;
+  transition: all 0.2s;
+}
+
+nav button.active {
+  color: var(--accent);
+}
+
+nav button:hover {
+  background: rgba(107,140,255,0.1); /* アクティブじゃなくてもホバーで反応 */
+}
+
+.nav-icon {
+  font-size: 22px;
+}
+
+.nav-label {
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+
+
 </style>
 
 </head>

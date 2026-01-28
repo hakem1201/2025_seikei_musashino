@@ -265,13 +265,13 @@ nav button.active{font-weight:bold;}
   100% { transform: scale(1); }
 }
 
-.complete-screen.flash {
-  animation: flashBg 0.3s ease-out forwards;
+.complete-card.flash {
+  animation: flashCardBg 0.3s ease-out forwards;
 }
 
-@keyframes flashBg {
+@keyframes flashCardBg {
   0%   { background-color: #F9F9FF; }
-  50%  { background-color: #FFF9C4; } /* 一瞬明るく */
+  50%  { background-color: #FFFEF5; }
   100% { background-color: #F9F9FF; }
 }
 
@@ -503,8 +503,9 @@ window.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => completeCard.classList.remove('bounce'), 300);
 
       // 背景フラッシュ
-      completeScreen.classList.add('flash');
-      setTimeout(() => completeScreen.classList.remove('flash'), 300);
+      // 背景フラッシュ → カードに変更
+      completeCard.classList.add('flash');
+      setTimeout(() => completeCard.classList.remove('flash'), 300);
 
       // バイブ（対応端末のみ）
       if (navigator.vibrate) {

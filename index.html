@@ -254,6 +254,27 @@ nav button.active{font-weight:bold;}
   }
 }
 
+/* ==== 完了演出強化 ==== */
+.complete-card.bounce {
+  animation: bounceCard 0.3s ease-out forwards;
+}
+
+@keyframes bounceCard {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+.complete-screen.flash {
+  animation: flashBg 0.3s ease-out forwards;
+}
+
+@keyframes flashBg {
+  0%   { background-color: #F9F9FF; }
+  50%  { background-color: #FFF9C4; } /* 一瞬明るく */
+  100% { background-color: #F9F9FF; }
+}
+
 </style>
 
 </head>
@@ -473,6 +494,22 @@ window.addEventListener('DOMContentLoaded', () => {
       addHistory(payValue);
       soundPay.currentTime = 0;
       soundPay.play().catch(()=>{});
+      // 完了演出
+      const completeScreen = sections.complete;
+      const completeCard = completeScreen.querySelector('.complete-card');
+
+      // カードバウンド
+      completeCard.classList.add('bounce');
+      setTimeout(() => completeCard.classList.remove('bounce'), 300);
+
+      // 背景フラッシュ
+      completeScreen.classList.add('flash');
+      setTimeout(() => completeScreen.classList.remove('flash'), 300);
+
+      // バイブ（対応端末のみ）
+      if (navigator.vibrate) {
+        navigator.vibrate(300); // 0.3秒
+      }
       showSection('complete');
       setTimeout(showHome,3000);
     },2000);
